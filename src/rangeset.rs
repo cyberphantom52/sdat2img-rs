@@ -1,3 +1,4 @@
+#[derive(Default, Debug, Clone, Copy)]
 pub struct Range((u64, u64));
 impl Range {
     pub fn new(start: u64, end: u64) -> Self {
@@ -21,8 +22,24 @@ impl Range {
     }
 }
 
+impl std::fmt::Display for Range {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Range({} - {})", self.start(), self.end())
+    }
+}
+
+#[derive(Default, Debug, Clone)]
 pub struct RangeSet {
     pairs: Vec<Range>,
+}
+
+impl std::fmt::Display for RangeSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for range in self.pairs() {
+            write!(f, "{},", range.start())?;
+        }
+        Ok(())
+    }
 }
 
 pub struct Iter<'a> {
