@@ -9,6 +9,16 @@ pub enum Command {
     Zero(RangeSet),
 }
 
+impl Command {
+    pub fn rangeset(&self) -> &RangeSet {
+        match self {
+            Command::Erase(rangeset) => rangeset,
+            Command::New(rangeset) => rangeset,
+            Command::Zero(rangeset) => rangeset,
+        }
+    }
+}
+
 impl std::fmt::Display for Command {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {

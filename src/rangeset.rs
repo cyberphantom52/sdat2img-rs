@@ -17,7 +17,7 @@ impl Range {
     }
 
     pub fn len(&self) -> u64 {
-        self.inner().1 - self.inner().0
+        self.end() - self.start()
     }
 }
 
