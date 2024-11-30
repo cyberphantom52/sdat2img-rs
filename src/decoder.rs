@@ -21,8 +21,9 @@ impl<W: Write + Seek, R: Read> SparseDecoder<W, R> {
         }
     }
 
-    pub fn enable_quiet(&mut self) {
+    pub fn quiet(mut self) -> Self {
         self.quiet = true;
+        self
     }
 
     pub fn decode(&mut self) -> std::io::Result<()> {

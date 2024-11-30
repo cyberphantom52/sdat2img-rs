@@ -53,7 +53,7 @@ fn main() -> std::io::Result<()> {
 
     let mut decoder = SparseDecoder::new(transfer_list, source, &destination);
     if args.quiet {
-        decoder.enable_quiet();
+        decoder = decoder.quiet();
     }
 
     decoder.decode()
