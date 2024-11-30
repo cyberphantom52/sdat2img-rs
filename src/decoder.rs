@@ -8,6 +8,7 @@ pub struct SparseDecoder<W: Write + Seek, R: Read> {
     transfer_list: TransferList,
     source: BufReader<R>,
     destination: BufWriter<W>,
+    quiet: bool,
 }
 
 impl<W: Write + Seek, R: Read> SparseDecoder<W, R> {
@@ -16,7 +17,12 @@ impl<W: Write + Seek, R: Read> SparseDecoder<W, R> {
             transfer_list,
             source: BufReader::new(source),
             destination: BufWriter::new(destination),
+            quiet: false,
         }
+    }
+
+    pub fn enable_quiet(&mut self) {
+        self.quiet = true;
     }
 
     pub fn decode(&mut self) -> std::io::Result<()> {
@@ -40,7 +46,9 @@ impl<W: Write + Seek, R: Read> SparseDecoder<W, R> {
                     for range in rangeset.iter() {
                         let offset = range.start() * BLOCK_SIZE;
                         let data_size = (range.len() * BLOCK_SIZE) as usize;
-                        println!("Writing {data_size} bytes at offset {offset}...");
+                        if !self.quiet {
+                            println!("Writing {data_size} bytes at offset {offset}...");
+                        }
 
                         self.destination.seek(SeekFrom::Start(offset))?;
 
@@ -49,7 +57,8 @@ impl<W: Write + Seek, R: Read> SparseDecoder<W, R> {
                         self.destination.write_all(&buffer)?;
                     }
                 }
-                _ => println!("Skipping command {}...", command),
+                _ if !self.quiet => println!("Skipping command {}...", command),
+                _ => {}
             }
         }
 

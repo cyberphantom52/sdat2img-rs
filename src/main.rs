@@ -21,6 +21,9 @@ struct Args {
 
     #[arg(short = 'o', long = "output")]
     output_image: PathBuf,
+
+    #[arg(short, long)]
+    quiet: bool,
 }
 
 fn main() -> std::io::Result<()> {
@@ -28,14 +31,16 @@ fn main() -> std::io::Result<()> {
     let transfer_list = args.transfer_list;
     let transfer_list = TransferList::try_from(transfer_list.as_path()).unwrap();
 
-    let version_msg = match transfer_list.version() {
-        1 => "Android Lollipop 5.0 detected!",
-        2 => "Android Lollipop 5.1 detected!",
-        3 => "Android Marshmallow 6.x detected!",
-        4 => "Android Nougat 7.x / Oreo 8.x detected!",
-        _ => "Unknown Android version detected!",
-    };
-    println!("{}", version_msg);
+    if !args.quiet {
+        let version_msg = match transfer_list.version() {
+            1 => "Android Lollipop 5.0 detected!",
+            2 => "Android Lollipop 5.1 detected!",
+            3 => "Android Marshmallow 6.x detected!",
+            4 => "Android Nougat 7.x / Oreo 8.x detected!",
+            _ => "Unknown Android version detected!",
+        };
+        println!("{}", version_msg);
+    }
 
     let sparse_file = args.new_dat_file;
     let source = File::open(sparse_file)?;
@@ -47,5 +52,9 @@ fn main() -> std::io::Result<()> {
         .open(output_image)?;
 
     let mut decoder = SparseDecoder::new(transfer_list, source, &destination);
+    if args.quiet {
+        decoder.enable_quiet();
+    }
+
     decoder.decode()
 }
